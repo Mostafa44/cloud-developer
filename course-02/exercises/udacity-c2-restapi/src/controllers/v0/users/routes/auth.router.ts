@@ -1,3 +1,4 @@
+import { config } from './../../../../config/config';
 import { Router, Request, Response } from 'express';
 
 import { User } from '../models/User';
@@ -24,9 +25,10 @@ async function comparePasswords(plainTextPassword: string, hash: string): Promis
     return await bcrypt.compare(plainTextPassword, hash);
 }
 
-// function generateJWT(user: User): string {
-//     //@TODO Use jwt to create a new JWT Payload containing
-// }
+function generateJWT(user: User): string {
+    //@TODO Use jwt to create a new JWT Payload containing
+    return jwt.sign(user, config.dev.jwt.secret)
+}
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
     return next();
@@ -83,7 +85,7 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 
     // Generate JWT
-    // const jwt = generateJWT(user);
+    const jwt = generateJWT(user);
 
     res.status(200).send({ auth: true, token: jwt, user: user.short() });
 });

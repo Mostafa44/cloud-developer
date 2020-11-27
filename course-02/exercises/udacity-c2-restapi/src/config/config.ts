@@ -8,6 +8,9 @@ export const config = {
     aws_region: "eu-west-3",
     aws_profile: "default",
     aws_media_bucket: "udagram-yossef-dev",
+    jwt: {
+      "secret": "helloworld"
+    }
   },
   prod: {
     username: "",
