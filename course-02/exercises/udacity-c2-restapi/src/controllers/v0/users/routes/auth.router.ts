@@ -1,3 +1,4 @@
+
 import { config } from './../../../../config/config';
 import { Router, Request, Response } from 'express';
 
@@ -27,29 +28,29 @@ async function comparePasswords(plainTextPassword: string, hash: string): Promis
 
 function generateJWT(user: User): string {
     //@TODO Use jwt to create a new JWT Payload containing
-    return jwt.sign(user, config.dev.jwt.secret)
+    return jwt.sign({ user }, config.dev.jwt.secret)
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
-    return next();
-    // if (!req.headers || !req.headers.authorization){
-    //     return res.status(401).send({ message: 'No authorization headers.' });
-    // }
+
+    if (!req.headers || !req.headers.authorization) {
+        return res.status(401).send({ message: 'No authorization headers.' });
+    }
 
 
-    // const token_bearer = req.headers.authorization.split(' ');
-    // if(token_bearer.length != 2){
-    //     return res.status(401).send({ message: 'Malformed token.' });
-    // }
+    const token_bearer = req.headers.authorization.split(' ');
+    if (token_bearer.length != 2) {
+        return res.status(401).send({ message: 'Malformed token.' });
+    }
 
-    // const token = token_bearer[1];
+    const token = token_bearer[1];
 
-    // return jwt.verify(token, "hello", (err, decoded) => {
-    //   if (err) {
-    //     return res.status(500).send({ auth: false, message: 'Failed to authenticate.' });
-    //   }
-    //   return next();
-    // });
+    return jwt.verify(token, config.dev.jwt.secret, (err, decoded) => {
+        if (err) {
+            return res.status(500).send({ auth: false, message: 'Failed to authenticate.' });
+        }
+        return next();
+    });
 }
 
 router.get('/verification',
@@ -111,8 +112,8 @@ router.post('/', async (req: Request, res: Response) => {
         return res.status(422).send({ auth: false, message: 'User may already exist' });
     }
 
-    //const password_hash = await generatePassword(plainTextPassword);
-    const password_hash = ""
+    const password_hash = await generatePassword(plainTextPassword);
+    //const password_hash = ""
     const newUser = await new User({
         email: email,
         password_hash: password_hash
@@ -126,7 +127,7 @@ router.post('/', async (req: Request, res: Response) => {
     }
 
     // Generate JWT
-    //const jwt = generateJWT(savedUser);
+    const jwt = generateJWT(savedUser);
 
     res.status(201).send({ token: jwt, user: savedUser.short() });
 });
