@@ -30,17 +30,20 @@ import { filterImageFromURL, deleteLocalFiles } from './util/util';
   /**************************************************************************** */
 
   //! END @TODO1
-  app.get("/filteredimage?image_url={{URL}}", async (req, res) => {
+  app.get("/filteredimage", async (req, res) => {
     let imageUrl = req.query.image_url;
+
     if (!imageUrl) {
       res.status(400).send({ message: 'image url is required' });
     }
+    console.log("#####");
+    console.log(imageUrl);
     let file = await filterImageFromURL(imageUrl);
     if (!file) {
       res.status(400).send({ message: 'wrong file parsing' });
     }
-    res.sendFile(file);
-    await deleteLocalFiles([file]);
+    res.status(200).sendFile(file, async () => { await deleteLocalFiles([file]) });
+    //await deleteLocalFiles([file]);
   });
   // Root Endpoint
   // Displays a simple message to the user
