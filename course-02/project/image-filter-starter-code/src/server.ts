@@ -38,7 +38,7 @@ import { filterImageFromURL, deleteLocalFiles } from './util/util';
     }
     console.log("#####");
     console.log(imageUrl);
-    let file = await filterImageFromURL(imageUrl);
+    let file = await filterImageFromURL(imageUrl as string);
     if (!file) {
       res.status(400).send({ message: 'wrong file parsing' });
     }
